@@ -1,0 +1,10 @@
+[
+  {
+    "code": "SBN-2K-1A2B3C",
+    "name": "Contoh User",
+    "contact": "08123456789",
+    "price": 2000,
+    "method": "QRIS",
+    "expiredAt": "2025-07-03T12:00:00.000Z"
+  }
+]
