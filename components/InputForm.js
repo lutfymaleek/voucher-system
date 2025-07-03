@@ -1,96 +1,73 @@
-import { useRouter } from 'next/router';
+import React from 'react';
+import Image from 'next/image';
 
-export default function InputForm({ formData, setFormData }) {
-  const router = useRouter();
-
-  const isValidContact = (value) => {
-    const phoneRegex = /^(08|62)[0-9]{8,13}$/;
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return phoneRegex.test(value) || emailRegex.test(value);
-  };
-
-  const handlePaymentChange = (method) => {
-    setFormData({ ...formData, paymentMethod: method });
-  };
-
-  const handleContactChange = (e) => {
-    const val = e.target.value;
-    const valid = isValidContact(val);
-    setFormData({ ...formData, contact: val, isContactValid: valid });
+export default function InputForm({ formData, setFormData, disabled = false }) {
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
   };
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="space-y-4 animate-fadeIn">
       {/* Nama */}
       <div>
-        <label className="block mb-1 text-sm font-medium text-gray-700 dark:text-gray-300">
-          Nama Pembeli
-        </label>
+        <label className="block text-sm text-gray-700 dark:text-gray-300 mb-1">Nama Lengkap</label>
         <input
           type="text"
-          placeholder="Contoh: Luthfy M. Fajar"
+          name="name"
           value={formData.name}
-          onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-          className="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:border-gray-700 dark:text-white"
+          onChange={handleChange}
+          disabled={disabled}
+          className="w-full px-3 py-2 border border-gray-300 rounded-md bg-white dark:bg-gray-800 dark:text-white focus:outline-none focus:ring focus:ring-blue-500 transition"
         />
       </div>
 
       {/* Kontak */}
       <div>
-        <label className="block mb-1 text-sm font-medium text-gray-700 dark:text-gray-300">
-          Kontak (WhatsApp / Email)
-        </label>
+        <label className="block text-sm text-gray-700 dark:text-gray-300 mb-1">Kontak (Email / WA)</label>
         <input
           type="text"
-          placeholder="e.g. 0812xxxx or email@example.com"
+          name="contact"
           value={formData.contact}
-          onChange={handleContactChange}
-          className={`w-full px-4 py-2 border rounded-lg shadow-sm focus:outline-none focus:ring-2 dark:bg-gray-800 dark:text-white ${
-            formData.contact && formData.isContactValid === false
-              ? 'border-red-500 focus:ring-red-500'
-              : 'border-gray-300 dark:border-gray-700 focus:ring-blue-500'
-          }`}
+          onChange={handleChange}
+          disabled={disabled}
+          className="w-full px-3 py-2 border border-gray-300 rounded-md bg-white dark:bg-gray-800 dark:text-white focus:outline-none focus:ring focus:ring-blue-500 transition"
         />
-        <div className="min-h-[1.25rem] mt-1">
-          {formData.contact && formData.isContactValid === false && (
-            <p className="text-red-600 text-sm">
-              Format kontak tidak valid. Masukkan nomor WhatsApp atau email yang benar.
-            </p>
-          )}
-        </div>
       </div>
 
       {/* Metode Pembayaran */}
       <div>
-        <label className="block mb-4 text-sm font-medium text-gray-700 dark:text-gray-300">
-          Metode Pembayaran:
+        <label className="block text-sm text-gray-700 dark:text-gray-300 mb-2">
+          Metode Pembayaran
         </label>
-        <div className="flex gap-4">
-          {['DANA', 'GoPay', 'QRIS'].map((method) => (
+        <div className="grid grid-cols-3 gap-2">
+          {[
+            { value: 'qris', label: 'QRIS', img: '/img/pay/qris.png' },
+            { value: 'ovo', label: 'OVO', img: '/img/pay/ovo.png' },
+            { value: 'dana', label: 'DANA', img: '/img/pay/dana.png' }
+          ].map((method) => (
             <button
-              key={method}
+              key={method.value}
               type="button"
-              onClick={() => handlePaymentChange(method)}
-              className={`flex-1 py-2 rounded-lg border text-sm font-semibold transition ${
-                formData.paymentMethod === method
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-white'
-              } hover:ring-2 hover:ring-blue-500`}
+              disabled={disabled}
+              onClick={() => setFormData(prev => ({ ...prev, paymentMethod: method.value }))}
+              className={`border rounded-md flex flex-col items-center justify-center p-2 transition ${
+                formData.paymentMethod === method.value
+                  ? 'border-blue-600 ring-2 ring-blue-400'
+                  : 'border-gray-300 hover:border-blue-400'
+              } ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
             >
-              {method}
+              <Image
+                src={method.img}
+                alt={method.label}
+                width={32}
+                height={32}
+                className="mb-1 object-contain"
+              />
+              <span className="text-xs font-medium text-gray-700 dark:text-gray-200">{method.label}</span>
             </button>
           ))}
         </div>
-      </div>
-
-      {/* Tombol Kembali */}
-      <div className="flex justify-center">
-        <button
-          onClick={() => router.push('/')}
-          className="w-full mt-2 py-2 bg-gray-200 text-gray-800 dark:bg-gray-800 dark:text-white font-medium rounded-md hover:bg-gray-300 dark:hover:bg-gray-700 transition"
-        >
-          ← Pilih Paket Kembali
-        </button>
       </div>
     </div>
   );
